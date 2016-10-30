@@ -1,32 +1,28 @@
 export default {
   chanceToLive: 0.45,
-  birthLimit: 5,
-  deathLimit: 5,
+  zombieThreshold: 3, // dead spot must have this many live neighbors to become a zombie
+  deathLimit: 1, // live spot must have this many live neighbors or it will die
   map: [],
   newMap: [],
   rows: 0,
   cols: 0,
 
   generateMap(map, rows, cols){
-    this.setVars(map, rows, cols);
+    this.rows = rows;
+    this.cols = cols;
+
     this.initMap();
     this.checkMap();
-    this.checkMap();
-        this.checkMap();
-            this.checkMap();
-                this.checkMap();
+    // this.checkMap();
+
 
     return this.map;
   },
 
-  setVars(map, rows, cols){
-    // this.map = map;
-    this.rows = rows;
-    this.cols = cols;
-  },
-
   //  seed map
   initMap() {
+    var trueCount = 0;
+    var falseCount = 0;
     this.map = [];
     var newRow = [];
 
@@ -35,12 +31,16 @@ export default {
       for(var x = 0; x < this.cols; x++){
         if(Math.random() < this.chanceToLive){
           newRow.push(true);
+          trueCount++;
         } else {
           newRow.push(false);
+          falseCount++;
         }
       }
       this.map.push(newRow);
     }
+    console.info('live1: ', trueCount);
+    console.info('dead1: ', falseCount);
   },
 
   checkMap(){
@@ -59,13 +59,14 @@ export default {
         if(map[y][x]){
           newRow.push(liveliness >= this.deathLimit);
         } else {
-          newRow.push(liveliness <= this.birthLimit);
+          newRow.push(liveliness > this.zombieThreshold);
         }
       }
       newMap.push(newRow);
     }
 
     this.map = this.newMap;
+    // console.log('map live', this.map);
   },
 
   countNeighbors(x, y){

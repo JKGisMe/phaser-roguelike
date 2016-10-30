@@ -1,11 +1,11 @@
-import * as mapGen from './cellularAutomata';
+import * as mapGen from './betterCA';
 
 // font size (should be named font size)
-var FONT = 32;
+var FONT = 24;
 
 // map dimensions
 var ROWS = 20; // 20
-var COLS = 60; // 60
+var COLS = 50; // 60
 
 // number of actors per level including player
 var ACTORS = 10;
@@ -20,17 +20,17 @@ function create() {
   // init keyboard
   game.input.keyboard.addCallbacks(null, null, onKeyUp);
 
-  map = mapGen.default.generateMap(map, ROWS, COLS);
+  map = mapGen.default.generateMap(ROWS, COLS);
 
   // init screen
   asciiDisplay = [];
-  var newRow;
-  for (var y = 0; y < ROWS; y++){
-    newRow = [];
-    asciiDisplay.push(newRow);
-    for(var x = 0; x < COLS; x++){
-      newRow.push(initCell('', x, y));
+  var newCol;
+  for (var x = 0; x < COLS; x++){
+    newCol = [];
+    for(var y = 0; y < ROWS; y++){
+      newCol.push(initCell('', x, y));
     }
+    asciiDisplay.push(newCol);
   }
 
   drawMap();
@@ -51,9 +51,9 @@ function onKeyUp(event){
 
 // MAP DRAWING
 function drawMap(){
-  for(var y = 0; y < ROWS; y++){
-    for(var x = 0; x < COLS; x++){
-      asciiDisplay[y][x].text = map[y][x] ? '.' : '#';
+  for(var x = 0; x < COLS; x++){
+    for(var y = 0; y < ROWS; y++){
+      asciiDisplay[x][y].text = map[x][y] ? '#' : '.';
     }
   }
 }
