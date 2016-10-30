@@ -1,4 +1,5 @@
 module.exports = {
+  devtool: 'source-map', 
   entry: './src/rl.js',
   output: {
      path: './dist',
