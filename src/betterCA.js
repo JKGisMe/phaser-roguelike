@@ -3,7 +3,7 @@ export default {
   map: [],
   rows: 10,
   cols: 25,
-  repetitions: 7,
+  repetitions: 6,
   wallConversionThreshhold: 5,
 
 

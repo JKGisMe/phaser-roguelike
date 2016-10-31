@@ -58,7 +58,13 @@ function onKeyUp(event){
 function drawMap(){
   for(var x = 0; x < COLS; x++){
     for(var y = 0; y < ROWS; y++){
-      asciiDisplay[x][y].text = map[x][y] ? '#' : '.';
+      if(map[x][y]){
+        asciiDisplay[x][y].text = '#';
+        asciiDisplay[x][y].style.fill = '#299E2C';
+      } else {
+        asciiDisplay[x][y].text = '.';
+        asciiDisplay[x][y].style.fill = '#103912';
+      }
     }
   }
 }
@@ -67,11 +73,13 @@ function drawActors(){
   actorList.forEach((actor) => {
     if(actor.hp > 0){
       asciiDisplay[actor.x][actor.y].text = 'x';
+      asciiDisplay[actor.x][actor.y].style.fill = '#951209';
     }
   });
+  console.log('asciiDisplay', asciiDisplay);
 }
 
 function initCell(chr, x, y){
-  var style = {font: FONT + "px monospace", fill: "red"};
+  var style = {font: FONT + "px monospace"};
   return game.add.text(FONT * 0.6 * x, FONT * y, chr, style);
 }
