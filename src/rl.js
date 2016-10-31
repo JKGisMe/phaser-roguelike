@@ -1,4 +1,5 @@
 import * as mapGen from './betterCA';
+import * as actorGen from './actors';
 
 // font size (should be named font size)
 var FONT = 24;
@@ -12,6 +13,7 @@ var ACTORS = 10;
 
 var map;
 var asciiDisplay;
+var actorList;
 
 // initialize phaser and call create() after
 var game = new Phaser.Game(COLS * FONT * 0.6, ROWS * FONT, Phaser.Auto, null, {create: create});
@@ -21,6 +23,8 @@ function create() {
   game.input.keyboard.addCallbacks(null, null, onKeyUp);
 
   map = mapGen.default.generateMap(ROWS, COLS);
+  actorList = actorGen.default.generateActors(map);
+
 
   // init screen
   asciiDisplay = [];
@@ -34,6 +38,7 @@ function create() {
   }
 
   drawMap();
+  drawActors();
 }
 
 function onKeyUp(event){
@@ -56,6 +61,14 @@ function drawMap(){
       asciiDisplay[x][y].text = map[x][y] ? '#' : '.';
     }
   }
+}
+
+function drawActors(){
+  actorList.forEach((actor) => {
+    if(actor.hp > 0){
+      asciiDisplay[actor.x][actor.y].text = 'x';
+    }
+  });
 }
 
 function initCell(chr, x, y){
