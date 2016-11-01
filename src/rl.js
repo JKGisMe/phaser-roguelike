@@ -14,6 +14,9 @@ var ACTORS = 10;
 var map;
 var asciiDisplay;
 var actorList;
+var actorMap;
+var player;
+var livingEnemies;
 
 // initialize phaser and call create() after
 var game = new Phaser.Game(COLS * FONT * 0.6, ROWS * FONT, Phaser.Auto, null, {create: create});
@@ -23,7 +26,7 @@ function create() {
   game.input.keyboard.addCallbacks(null, null, onKeyUp);
 
   map = mapGen.default.generateMap(ROWS, COLS);
-  actorList = actorGen.default.generateActors(map);
+  [actorMap, actorList] = actorGen.default.generateActors(map);
 
 
   // init screen
@@ -38,20 +41,35 @@ function create() {
   }
 
   drawMap();
-  drawActors();
+  setupActors();
+
 }
 
 function onKeyUp(event){
+  drawMap();
+
+  var acted = false;
   switch(event.keyCode){
     case Phaser.Keyboard.LEFT:
+      acted = move(player, {x: -1, y: 0});
+      break;
 
     case Phaser.Keyboard.RIGHT:
+      acted = move(player,{x: 1, y: 0});
+      break;
 
     case Phaser.Keyboard.UP:
+      acted = move(player, {x: 0, y: -1});
+      break;
 
     case Phaser.Keyboard.DOWN:
+      acted = move(player, {x: 0, y: 1});
+      break;
 
   }
+
+  drawPlayer();
+  drawActors();
 }
 
 // MAP DRAWING
@@ -69,17 +87,80 @@ function drawMap(){
   }
 }
 
+function setupActors(){
+  player = actorList[0];
+  livingEnemies = actorList.length - 1;
+  drawPlayer();
+  drawActors();
+}
+
+function drawPlayer(){
+  if(player.hp > 0){
+
+    asciiDisplay[player.x][player.y].text = '' + player.hp;
+    asciiDisplay[player.x][player.y].style.fill = '#ffffff';
+  }
+}
+
 function drawActors(){
+  let count = 0;
   actorList.forEach((actor) => {
-    if(actor.hp > 0){
+    count++;
+
+    if(actor && actor.hp > 0 && count > 1){
       asciiDisplay[actor.x][actor.y].text = 'x';
       asciiDisplay[actor.x][actor.y].style.fill = '#951209';
     }
+
   });
-  console.log('asciiDisplay', asciiDisplay);
 }
 
 function initCell(chr, x, y){
   var style = {font: FONT + "px monospace"};
   return game.add.text(FONT * 0.6 * x, FONT * y, chr, style);
+}
+
+function canGo(actor, direction){
+  const potentialX = actor.x + direction.x;
+  const potentialY = actor.y + direction.y;
+
+  return potentialX >= 0 && potentialX <= COLS - 1
+            && potentialY >= 0 && potentialY <= ROWS - 1
+            && !map[potentialX][potentialY];
+}
+
+function move(actor, direction){
+  const newX = actor.x + direction.x;
+  const newY = actor.y + direction.y;
+  if(!canGo(actor, direction)){
+    return false;
+  }
+
+  const newKey = newX + '_' + newY;
+  // if there isn't actor in the spot
+  if(actorMap[newKey] != null){
+
+    var victim = actorMap[newKey];
+    victim.hp--;
+
+    if(victim.hp === 0){
+      actorMap[newKey] = null;
+      actorList[actorList.indexOf(victim)] = null;
+      if(victim != player){
+        livingEnemies--;
+        if(livingEnemies === 0){
+          var victory = game.add.text(game.world.centerX, game.world.centerY, 'Victory!\nCtrl+r to restart', { fill : '#2e2', align: "center" } );
+          victory.anchor.setTo(0.5, 0.5);
+        }
+      }
+    }
+  } else {
+    actorMap[actor.x + '_' + actor.y] = null;
+    actor.y = newY;
+    actor.x = newX;
+
+    actorMap[actor.x + '_' + actor.y] = actor;
+  }
+
+  return true;
 }

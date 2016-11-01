@@ -1,5 +1,5 @@
 export default {
-  actors: 5,
+  actors: 6,
 
   map: [],
   actorList: [],
@@ -9,7 +9,7 @@ export default {
     this.map = map;
     this.initActors();
 
-    return this.actorList;
+    return [this.actorMap, this.actorList];
   },
 
   initActors(){
